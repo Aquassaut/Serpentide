@@ -1,3 +1,6 @@
+from constants import *
+
+
 class Segment:
     """ Defines a segment with a length of 1 according
     to its starting point and its direction """
@@ -14,13 +17,26 @@ class Segment:
         self.y += dy
 
     def getEndPoint(self):
-        """return the ending point of the segment in a tuple"""
+        """returns the ending point of the segment in a tuple"""
         return {
-            0: (self.x + 1, self.y),
-            1: (self.x, self.y - 1),
-            2: (self.x - 1, self.y),
-            3: (self.x, self.y + 1),
+            0: (self.x - SSIZE, self.y),
+            1: (self.x, self.y + SSIZE),
+            2: (self.x + SSIZE, self.y),
+            3: (self.x, self.y - SSIZE),
         }[self.dct]
+
+    def getStartPoint(self):
+        """returns the starting point of the segment in a tuple"""
+        return (self.x, self.y)
 
     def getDct(self):
         return self.dct
+
+    def addGraphicObject(self, go):
+        self.go = go
+
+    def getGraphicObject(self):
+        return self.go
+
+    def rmGraphicObject(self):
+        self.go = None

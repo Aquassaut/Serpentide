@@ -1,4 +1,4 @@
-import Segment
+from Segment import *
 
 
 class Parser:
@@ -8,10 +8,10 @@ class Parser:
         pass
 
     def toSegments(self, sequence):
-        position = (0, 0)
+        position = (MIDDLE, MIDDLE)
         seqList = []
         for segment in sequence:
-            temp = Segment.Segment(position[0], position[1], int(segment))
+            temp = Segment(position[0], position[1], int(segment))
             position = temp.getEndPoint()
             seqList.append(temp)
         return seqList

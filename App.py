@@ -20,18 +20,24 @@ class App:
 
     def drawFileMenu(self, menuBar):
         filemenu = Menu(menuBar, tearoff=0)
-        filemenu.add_command(label="New")
+        filemenu.add_command(label="New", command=self.new)
         filemenu.add_command(label="Open...", command=self.openFile)
         filemenu.add_command(label="Save")
         filemenu.add_command(label="Save as...")
+        filemenu.add_command(label="Debug", command=self.debug)
         filemenu.add_command(label="Quit", command=root.quit)
         return filemenu
+
+    def new(self):
+        self.can.wipe([])
+
+    def debug(self):
+        print Parser().toSequence(self.can.segs)
 
     def openFile(self):
         filename = self.getFileDialog()
         received = Parser().readFromFile(filename)
-        #TEST
-        print received
+        self.can.wipe(received)
 
     def getFileDialog(self):
         return askopenfilename(filetypes=[("All file types", "*")])
