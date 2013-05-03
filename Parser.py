@@ -25,3 +25,15 @@ class Parser:
     def readFromInput(self):
         sequence = raw_input()
         return self.toSegments(sequence)
+
+    def readFromFile(self, filename):
+        file = open(filename)
+        fileData = file.read()
+        file.close()
+        return self.toSegments(fileData)
+
+    def writeToFile(self, segments, filename):
+        seq = self.toSequence(segments)
+        file = open(filename, "w")
+        file.write(seq)
+        file.close()
