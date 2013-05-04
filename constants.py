@@ -6,10 +6,20 @@ NBCELL = 25  # number of cells in the grid
 SFILL = "red"  # segment color
 SSIZE = GSIZE/NBCELL  # size of a segment
 MIDDLE = NBCELL/2 * NBCELL  # approximate middle angle
-TOL = 4  # fat finger tolerance
+CR = 8  # radius of helper circles
 FOPT = {
     'filetypes': [
         ("Serpentide Walk file", "*.spw"),
         ("All file types", "*.*")],
     'defaultextension': '.spw'
 }  # default file browser options
+HCOPT = {
+    'fill': "",
+    'outline': "",
+    'stipple': "gray25"
+}  # hidden circles' options
+SCOPT = {
+    'fill': "brown",
+    'outline': "brown",
+    'stipple': "gray25"
+}  # shown circles' options

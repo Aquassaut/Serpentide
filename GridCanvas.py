@@ -1,7 +1,7 @@
 from Tkinter import *
 from constants import *
 from Segment import *
-from math import floor, fabs
+from math import fabs
 
 
 class GridCanvas:
@@ -33,17 +33,17 @@ class GridCanvas:
             for ver in range(1, NBCELL):
                 x = NBCELL*hor
                 y = NBCELL*ver
-                temp = self.can.create_oval(x - 8, y - 8, x + 8, y + 8, fill="", outline="", stipple="gray25")
+                temp = self.can.create_oval(x - CR, y - CR, x + CR, y + CR, **HCOPT)
                 self.helpCircles.append(temp)
 
     def hideHelp(self):
         for circle in self.helpCircles:
-            self.can.itemconfig(circle, fill="", outline="")
+            self.can.itemconfig(circle, **HCOPT)
         self.helpShown = False
 
     def showHelp(self):
         for circle in self.helpCircles:
-            self.can.itemconfig(circle, fill="brown", outline="brown")
+            self.can.itemconfig(circle, **SCOPT)
         self.helpShown = True
 
     def wipe(self, segments):
@@ -123,23 +123,6 @@ class GridCanvas:
     def click(self, event):
         if not self.helpShown:
             self.showHelp()
-
-        """if self.segs == []:
-            self.newSeg(Segment(SSIZE*(event.x/SSIZE), SSIZE*(event.y/SSIZE), 1))
-        elif self.walkable(event.x, event.y):
-            x, y = self.segs[-1].getEndPoint()
-            if fabs(event.x - x) < TOL:
-                if event.y < y:
-                    dct = 3
-                else:
-                    dct = 1
-            else:
-                if event.x > x:
-                    dct = 0
-                else:
-                    dct = 2
-            print dct
-            self.newSeg(Segment(x, y, dct))"""
 
     def walkable(self, x, y):
         #il faut que
