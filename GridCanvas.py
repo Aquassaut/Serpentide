@@ -15,12 +15,16 @@ class GridCanvas:
     def __init__(self, root):
         self.segs = []
         self.can = Canvas(root, bg=CBG, height=GSIZE, width=GSIZE)
-        self.can.pack(side=LEFT)
+        self.can.pack(expand=YES, side=LEFT)
         self.drawHelp()
         self.drawGrid()
         self.can.bind("<Button-1>", self.click)
         self.can.bind("<B1-Motion>", self.swipe)
         self.can.bind("<ButtonRelease-1>", self.swipeEnd)
+        self.can.bind("<Up>", self.upKey)
+        self.can.bind("<Down>", self.downKey)
+        self.can.bind("<Left>", self.leftKey)
+        self.can.bind("<Right>", self.rightKey)
 
     def drawGrid(self):
         for div in range(NBCELL):
@@ -55,25 +59,45 @@ class GridCanvas:
         self.segs = segments
         self.redrawSegs()
 
-    def requestSeg(self, circle):
+    def segRequest(self, x, y, X, Y, dct=None):
+        if self.segs == []:
+            free = True
+        else:
+            free = self.freePoint(X, Y)
+        if free:
+            if dct is None:
+                dct = self.findDct(x, y, X, Y)
+            seg = Segment(x, y, dct)
+            self.segs.append(seg)
+            self.drawSeg(self.segs[-1])
+        else:
+            if self.counterSeg(x, y, X, Y):
+                self.eraseLastSeg()
+
+    def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
         X = (Xa + Xb)/2
         Y = (Ya + Yb)/2
         if self.segs == []:
             x, y = self.firstCoords
-            free = True
         else:
             x, y = self.segs[-1].getEndPoint()
-            free = self.freePoint(X, Y)
         cont = self.continuous(x, y, X, Y)
-        if cont and free:
-            dct = self.findDct(x, y, X, Y)
-            seg = Segment(x, y, dct)
-            self.segs.append(seg)
-            self.drawSeg(self.segs[-1])
-        elif cont:
-            if self.counterSeg(x, y, X, Y):
-                self.eraseLastSeg()
+        if cont:
+            self.segRequest(x, y, X, Y)
+
+    def requestSegByDct(self, dct):
+        if self.segs == []:
+            x, y = MIDDLE, MIDDLE
+        else:
+            x, y = self.segs[-1].getEndPoint()
+        X, Y = {
+            0: (x + SSIZE, y),
+            1: (x, y + SSIZE),
+            2: (x - SSIZE, y),
+            3: (x, y - SSIZE),
+        }[dct]
+        self.segRequest(x, y, X, Y, dct)
 
     def findDct(self, x, y, X, Y):
         if x == X:
@@ -130,13 +154,14 @@ class GridCanvas:
             self.showHelp()
         circle = self.findInter(event.x, event.y)
         if circle:
-            self.requestSeg(circle)
+            self.requestSegByCircle(circle)
 
     def swipeEnd(self, event):
         if self.helpShown:
             self.hideHelp()
 
     def click(self, event):
+        self.can.focus_force()
         if self.segs == []:
             startCircle = self.findInter(event.x, event.y)
             if startCircle:
@@ -144,3 +169,19 @@ class GridCanvas:
                 self.firstCoords = ((xa + xb)/2, (ya + yb)/2)
         if not self.helpShown:
             self.showHelp()
+
+    def leftKey(self, event):
+        print "Key pressed"
+        self.requestSegByDct(2)
+
+    def downKey(self, event):
+        print "Key pressed"
+        self.requestSegByDct(1)
+
+    def rightKey(self, event):
+        print "Key pressed"
+        self.requestSegByDct(0)
+
+    def upKey(self, event):
+        print "Key pressed"
+        self.requestSegByDct(3)
