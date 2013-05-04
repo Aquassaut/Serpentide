@@ -68,11 +68,15 @@ class GridCanvas:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
             seg = Segment(x, y, dct)
+            if len(self.segs) > 0:
+                self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=SFILL)
             self.segs.append(seg)
-            self.drawSeg(self.segs[-1])
+            self.drawSeg(self.segs[-1], LFILL)
         else:
             if self.counterSeg(x, y, X, Y):
                 self.eraseLastSeg()
+                if len(self.segs) > 0:
+                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
@@ -129,10 +133,10 @@ class GridCanvas:
         ver = fabs(y - Y) == 25 and x == X
         return (hor and not ver) or (ver and not hor)
 
-    def drawSeg(self, seg):
+    def drawSeg(self, seg, sfill=SFILL):
         x, y = seg.getStartPoint()
         X, Y = seg.getEndPoint()
-        go = self.can.create_line(x, y, X, Y, width=3, fill=SFILL)
+        go = self.can.create_line(x, y, X, Y, width=3, fill=sfill)
         seg.addGraphicObject(go)
 
     def eraseLastSeg(self):
