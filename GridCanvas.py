@@ -171,17 +171,13 @@ class GridCanvas:
             self.showHelp()
 
     def leftKey(self, event):
-        print "Key pressed"
         self.requestSegByDct(2)
 
     def downKey(self, event):
-        print "Key pressed"
         self.requestSegByDct(1)
 
     def rightKey(self, event):
-        print "Key pressed"
         self.requestSegByDct(0)
 
     def upKey(self, event):
-        print "Key pressed"
         self.requestSegByDct(3)
