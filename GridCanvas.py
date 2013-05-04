@@ -57,39 +57,45 @@ class GridCanvas:
         Xa, Ya, Xb, Yb = self.can.coords(circle)
         X = (Xa + Xb)/2
         Y = (Ya + Yb)/2
-
-        # lets see if it's in the continuity of the last segment
-
         if self.segs == []:
-            x = X - 25
-            y = Y
-            walkable = True
-            pointAlreadyUsed = False
+            x, y = X - 25, Y
+            free = cont = True
         else:
             x, y = self.segs[-1].getEndPoint()
-            walkable = fabs(x - X) == 25 and not fabs(y - Y) == 25
-            walkable = walkable or fabs(y - Y) == 25 and not fabs(x - X) == 25
-        #let's see if it's auto avoiding
-            pointAlreadyUsed = self.segs[0].getStartPoint() == (X, Y)
-            for seg in self.segs:
-                pointAlreadyUsed = pointAlreadyUsed or seg.getEndPoint() == (X, Y)
-
-        #if everything is OK
-        if walkable and not pointAlreadyUsed:
-            if x == X:
-                if Y < y:
-                    dct = 3
-                else:
-                    dct = 1
-            else:
-                if X > x:
-                    dct = 0
-                else:
-                    dct = 2
-
+            cont = self.continuous(x, y, X, Y)
+            free = self.freePoint(X, Y)
+        if cont and free:
             seg = Segment(x, y, dct)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1])
+
+    def findDct(self, x, y, X, Y):
+        if x == X:
+            if Y < y:
+                return 3
+            else:
+                return 1
+        else:
+            if X > x:
+                return 0
+            else:
+                return 2
+
+    def freePoint(self, X, Y):
+        if self.segs[0].getStartPoint() == (X, Y):
+            return False
+        for seg in self.segs:
+            if seg.getEndPoint() == (X, Y):
+                return False
+        return True
+
+    def continuous(self, x, y, X, Y):
+        if self.segs == []:
+            return True
+        else:
+            hor = fabs(x - X) == 25
+            ver = fabs(y - Y) == 25
+            return (hor and not ver) or (ver and not hor)
 
     def drawSeg(self, seg):
         x, y = seg.getStartPoint()
@@ -101,6 +107,13 @@ class GridCanvas:
         for seg in self.segs:
             self.drawSeg(seg)
 
+    def findInter(self, x, y):
+        items = self.can.find_overlapping(x, y, x, y)
+        for item in items:
+            if item in self.helpCircles:
+                return item
+        return False
+
     def swipe(self, event):
         if not self.helpShown:
             self.showHelp()
@@ -109,13 +122,6 @@ class GridCanvas:
             print (event.x, event.y)
             self.requestSeg(circle)
 
-    def findInter(self, x, y):
-        items = self.can.find_overlapping(x, y, x, y)
-        for item in items:
-            if item in self.helpCircles:
-                return item
-        return False
-
     def swipeEnd(self, event):
         if self.helpShown:
             self.hideHelp()
@@ -123,12 +129,3 @@ class GridCanvas:
     def click(self, event):
         if not self.helpShown:
             self.showHelp()
-
-    def walkable(self, x, y):
-        #il faut que
-        testx, testy = self.segs[-1].getEndPoint()
-        #testx soit 25 px plus loin ET que testy soit le meme OU
-        #testx soit le meme ET testy soit 25px plus loin, PAS EN MEME TEMPS
-        hor = fabs(testx - x) - SSIZE < TOL and fabs(testy - y) < TOL
-        ver = fabs(testy - y) - SSIZE < TOL and fabs(testx - x) < TOL
-        return (hor and not ver) or (ver and not hor)
