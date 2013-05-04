@@ -71,6 +71,9 @@ class GridCanvas:
             seg = Segment(x, y, dct)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1])
+        elif cont:
+            if self.counterSeg(x, y, X, Y):
+                self.eraseLastSeg()
 
     def findDct(self, x, y, X, Y):
         if x == X:
@@ -83,6 +86,11 @@ class GridCanvas:
                 return 0
             else:
                 return 2
+
+    def counterSeg(self, x, y, X, Y):
+        st = self.segs[-1].getStartPoint()
+        end = self.segs[-1].getEndPoint()
+        return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
         if self.segs[0].getStartPoint() == (X, Y):
@@ -102,6 +110,9 @@ class GridCanvas:
         X, Y = seg.getEndPoint()
         go = self.can.create_line(x, y, X, Y, width=3, fill=SFILL)
         seg.addGraphicObject(go)
+
+    def eraseLastSeg(self):
+        self.can.delete(self.segs.pop().getGraphicObject())
 
     def redrawSegs(self):
         for seg in self.segs:
