@@ -19,9 +19,9 @@ class Segment:
     def getEndPoint(self):
         """returns the ending point of the segment in a tuple"""
         return {
-            0: (self.x - SSIZE, self.y),
+            0: (self.x + SSIZE, self.y),
             1: (self.x, self.y + SSIZE),
-            2: (self.x + SSIZE, self.y),
+            2: (self.x - SSIZE, self.y),
             3: (self.x, self.y - SSIZE),
         }[self.dct]
 
