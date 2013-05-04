@@ -7,3 +7,9 @@ SFILL = "red"  # segment color
 SSIZE = GSIZE/NBCELL  # size of a segment
 MIDDLE = NBCELL/2 * NBCELL  # approximate middle angle
 TOL = 4  # fat finger tolerance
+FOPT = {
+    'filetypes': [
+        ("Serpentide Walk file", "*.spw"),
+        ("All file types", "*.*")],
+    'defaultextension': '.spw'
+}  # default file browser options

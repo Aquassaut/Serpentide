@@ -6,19 +6,34 @@ from math import floor, fabs
 
 class GridCanvas:
 
+    segs = []
+    helpCircles = []
+    can = None
+
     def __init__(self, root):
         self.segs = []
         self.can = Canvas(root, bg=CBG, height=GSIZE, width=GSIZE)
         self.can.bind("<Button-1>", self.click)
-        self.can.bind("<Button1-Motion>", self.swipe)
+        self.can.bind("<B1-Motion>", self.swipe)
+        self.can.bind("<ButtonRelease-1>", self.swipeEnd)
         self.can.pack(side=LEFT)
         self.drawGrid()
+        self.drawHelp()
 
     def drawGrid(self):
         for div in range(NBCELL):
             sec = NBCELL*div
             self.can.create_line(0, sec, GSIZE, sec, width=3, fill=GFILL)
             self.can.create_line(sec, 0, sec, GSIZE, width=3, fill=GFILL)
+
+    def drawHelp(self):
+        self.helpCircles = []
+        for hor in range(1, NBCELL):
+            for ver in range(1, NBCELL):
+                x = NBCELL*hor
+                y = NBCELL*ver
+                temp = self.can.create_oval(x - 8, y - 8, x + 8, y + 8, fill="brown", stipple="gray12")
+                self.helpCircles.append(temp)
 
     def wipe(self, segments):
         for seg in self.segs:
@@ -42,12 +57,15 @@ class GridCanvas:
             self.drawSeg(seg)
 
     def swipe(self, event):
-        print "C'est un deplacement !"
-        print str(event.x), str(event.y)
+        pass
+
+    def swipeEnd(self, event):
+        pass
 
     def click(self, event):
         if self.segs == []:
-            self.newSeg(Segment(SIZE*event.x/SSIZE, SIZE*event.y/SSIZE, 1))
+
+            self.newSeg(Segment(SSIZE*(event.x/SSIZE), SSIZE*(event.y/SSIZE), 1))
         elif self.walkable(event.x, event.y):
             x, y = self.segs[-1].getEndPoint()
             if fabs(event.x - x) < TOL:
@@ -62,8 +80,6 @@ class GridCanvas:
                     dct = 0
             print dct
             self.newSeg(Segment(x, y, dct))
-        print "C'est un clic !"
-        print str(event.x), str(event.y)
 
     def walkable(self, x, y):
         #il faut que
