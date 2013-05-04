@@ -10,6 +10,7 @@ class GridCanvas:
     helpCircles = []
     can = None
     helpShown = False
+    firstCoords = None
 
     def __init__(self, root):
         self.segs = []
@@ -47,6 +48,7 @@ class GridCanvas:
         self.helpShown = True
 
     def wipe(self, segments):
+        self.firstCoords = None
         for seg in self.segs:
             self.can.delete(seg.getGraphicObject())
             seg.rmGraphicObject()
@@ -58,13 +60,14 @@ class GridCanvas:
         X = (Xa + Xb)/2
         Y = (Ya + Yb)/2
         if self.segs == []:
-            x, y = X - 25, Y
-            free = cont = True
+            x, y = self.firstCoords
+            free = True
         else:
             x, y = self.segs[-1].getEndPoint()
-            cont = self.continuous(x, y, X, Y)
             free = self.freePoint(X, Y)
+        cont = self.continuous(x, y, X, Y)
         if cont and free:
+            dct = self.findDct(x, y, X, Y)
             seg = Segment(x, y, dct)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1])
@@ -90,12 +93,9 @@ class GridCanvas:
         return True
 
     def continuous(self, x, y, X, Y):
-        if self.segs == []:
-            return True
-        else:
-            hor = fabs(x - X) == 25
-            ver = fabs(y - Y) == 25
-            return (hor and not ver) or (ver and not hor)
+        hor = fabs(x - X) == 25 and y == Y
+        ver = fabs(y - Y) == 25 and x == X
+        return (hor and not ver) or (ver and not hor)
 
     def drawSeg(self, seg):
         x, y = seg.getStartPoint()
@@ -119,7 +119,6 @@ class GridCanvas:
             self.showHelp()
         circle = self.findInter(event.x, event.y)
         if circle:
-            print (event.x, event.y)
             self.requestSeg(circle)
 
     def swipeEnd(self, event):
@@ -127,5 +126,10 @@ class GridCanvas:
             self.hideHelp()
 
     def click(self, event):
+        if self.segs == []:
+            startCircle = self.findInter(event.x, event.y)
+            if startCircle:
+                xa, ya, xb, yb = self.can.coords(startCircle)
+                self.firstCoords = ((xa + xb)/2, (ya + yb)/2)
         if not self.helpShown:
             self.showHelp()
