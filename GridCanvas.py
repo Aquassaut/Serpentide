@@ -28,7 +28,7 @@ class GridCanvas:
 
     def drawGrid(self):
         for div in range(NBCELL):
-            sec = NBCELL*div
+            sec = SSIZE*div
             self.can.create_line(0, sec, GSIZE, sec, width=3, fill=GFILL)
             self.can.create_line(sec, 0, sec, GSIZE, width=3, fill=GFILL)
 
@@ -36,8 +36,8 @@ class GridCanvas:
         self.helpCircles = []
         for hor in range(1, NBCELL):
             for ver in range(1, NBCELL):
-                x = NBCELL*hor
-                y = NBCELL*ver
+                x = SSIZE*hor
+                y = SSIZE*ver
                 temp = self.can.create_oval(x - CR, y - CR, x + CR, y + CR, **HCOPT)
                 self.helpCircles.append(temp)
 
