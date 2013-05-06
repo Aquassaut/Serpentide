@@ -23,10 +23,10 @@ class GridCanvas:
         self.can.bind("<Button-1>", self.click)
         self.can.bind("<B1-Motion>", self.swipe)
         self.can.bind("<ButtonRelease-1>", self.swipeEnd)
-        self.can.bind("<Up>", self.upKey)
-        self.can.bind("<Down>", self.downKey)
-        self.can.bind("<Left>", self.leftKey)
-        self.can.bind("<Right>", self.rightKey)
+        self.can.bind("<Up>", self.keyMove)
+        self.can.bind("<Down>", self.keyMove)
+        self.can.bind("<Left>", self.keyMove)
+        self.can.bind("<Right>", self.keyMove)
         self.can.bind("<Control-z>", self.cancel)
         self.can.bind(LCAM, self.leftCamKey)
         self.can.bind(RCAM, self.rightCamKey)
@@ -217,17 +217,14 @@ class GridCanvas:
             seg.move(dx, dy)
         self.wipe(self.segs)
 
-    def leftKey(self, event):
-        self.requestSegByDct(2)
-
-    def downKey(self, event):
-        self.requestSegByDct(1)
-
-    def rightKey(self, event):
-        self.requestSegByDct(0)
-
-    def upKey(self, event):
-        self.requestSegByDct(3)
+    def keyMove(self, event):
+        dctPerKey = {
+            111: 3,
+            114: 0,
+            116: 1,
+            113: 2
+        }
+        self.requestSegByDct(dctPerKey[event.keycode])
 
     def leftCamKey(self, event):
         self.moveAllSeg(2)
