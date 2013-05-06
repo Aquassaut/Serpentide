@@ -61,10 +61,7 @@ class GridCanvas:
         self.redrawSegs()
 
     def segRequest(self, x, y, X, Y, dct=None):
-        if self.segs == []:
-            free = True
-        else:
-            free = self.freePoint(X, Y)
+        free = self.freePoint(X, Y)
         if free:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
@@ -122,6 +119,8 @@ class GridCanvas:
         return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
+        if segs == []:
+            return True
         if not self.allowSelfAvoidOnly:
             return True
         if self.segs[0].getStartPoint() == (X, Y):
