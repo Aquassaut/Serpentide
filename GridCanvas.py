@@ -28,10 +28,9 @@ class GridCanvas:
         self.can.bind("<Left>", self.keyMove)
         self.can.bind("<Right>", self.keyMove)
         self.can.bind("<Control-z>", self.undo)
-        self.can.bind(LCAM, self.leftCamKey)
-        self.can.bind(RCAM, self.rightCamKey)
-        self.can.bind(UCAM, self.upCamKey)
-        self.can.bind(DCAM, self.downCamKey)
+        for key in [LCAM, RCAM, UCAM, DCAM]:
+            self.can.bind(key, self.keyCam)
+
         self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
 
     def drawGrid(self):
@@ -226,17 +225,15 @@ class GridCanvas:
         }
         self.requestSegByDct(dctPerKey[event.keycode])
 
-    def leftCamKey(self, event):
-        self.moveAllSeg(2)
+    def keyCam(self, event):
+        movPerKey = {
+            RCAM: 0,
+            DCAM: 1,
+            LCAM: 2,
+            UCAM: 3
+        }
+        self.moveAllSeg(movPerKey[event.char])
 
-    def downCamKey(self, event):
-        self.moveAllSeg(1)
-
-    def rightCamKey(self, event):
-        self.moveAllSeg(0)
-
-    def upCamKey(self, event):
-        self.moveAllSeg(3)
 
     def undo(self, event=None):
         if not self.segs == []:
