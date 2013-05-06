@@ -83,7 +83,11 @@ class GridCanvas:
         X = (Xa + Xb)/2
         Y = (Ya + Yb)/2
         if self.segs == []:
-            x, y = self.firstCoords
+            if self.firstCoords is not None:
+                x, y = self.firstCoords
+            else:
+                self.firstCoords = (X, Y)
+                return
         else:
             x, y = self.segs[-1].getEndPoint()
         cont = self.continuous(x, y, X, Y)
