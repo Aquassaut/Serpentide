@@ -324,6 +324,7 @@ class GridCanvas:
 
     # Delete the last segment (uses the fact that creating a segment over the
     # last one erase it).
+    # TODO : make it compatible with rotation
     def undo(self, event=None):
         if not self.segs == []:
             self.requestSegByDct((self.segs[-1].getDct() + 2) % 4)
