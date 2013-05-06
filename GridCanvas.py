@@ -1,7 +1,7 @@
 from Tkinter import *
 from constants import *
 from Segment import *
-from math import fabs
+from math import fabs, pi
 
 
 class GridCanvas:
@@ -28,6 +28,7 @@ class GridCanvas:
         self.can.bind("<Left>", self.keyMove)
         self.can.bind("<Right>", self.keyMove)
         self.can.bind("<Control-z>", self.undo)
+        self.can.bind("<Double-Button-1>", self.doubleClick)
         for key in [LCAM, RCAM, UCAM, DCAM]:
             self.can.bind(key, self.keyCam)
 
@@ -199,6 +200,25 @@ class GridCanvas:
         if not self.helpShown:
             self.showHelp()
 
+    def doubleClick(self, event):
+        doRotation = False
+
+        self.can.focus_force()
+        interCircle = self.findInter(event.x, event.y)
+        if interCircle:
+            xa, ya, xb, yb = self.can.coords(interCircle)
+            inter = ((xa + xb)/2, (ya + yb)/2)
+            for seg in self.segs:
+                if (not doRotation) and (seg.getStartPoint() == inter):
+                    doRotation = True
+                    lastInter = inter
+                if doRotation:
+                    seg.place(lastInter)
+                    seg.rotate(pi/2)
+                    lastInter = seg.getEndPoint()
+
+            self.wipe(self.segs)
+
     def moveAllSeg(self, dct, amount=1):
         dy = 0
         dx = 0
@@ -214,7 +234,9 @@ class GridCanvas:
         dy = dy * amount * SSIZE
         for seg in self.segs:
             seg.move(dx, dy)
+
         self.wipe(self.segs)
+        self.moveLead(dx, dy)
 
     def keyMove(self, event):
         dctPerKey = {
@@ -233,7 +255,6 @@ class GridCanvas:
             UCAM: 3
         }
         self.moveAllSeg(movPerKey[event.char])
-
 
     def undo(self, event=None):
         if not self.segs == []:

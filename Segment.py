@@ -1,5 +1,5 @@
 from constants import *
-
+from math import sin, cos, pi
 
 class Segment:
     """ Defines a segment with a length of 1 according
@@ -40,3 +40,16 @@ class Segment:
 
     def rmGraphicObject(self):
         self.go = None
+
+    def place(self, point ):
+        self.x = point[0]
+        self.y = point[1]
+
+    def rotate(self, angle=pi):
+        self.dct = self.dct + 2*angle/pi
+
+        while self.dct > 3:
+            self.dct = self.dct - 4
+
+        while self.dct < 0:
+            self.dct = self.dct + 4
