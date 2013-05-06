@@ -12,6 +12,7 @@ class GridCanvas:
     helpShown = False
     firstCoords = None
     allowSelfAvoidOnly = True
+    lead = None
 
     def __init__(self, root):
         self.segs = []
@@ -27,10 +28,14 @@ class GridCanvas:
         self.can.bind("<Left>", self.leftKey)
         self.can.bind("<Right>", self.rightKey)
         self.can.bind("<Control-z>", self.cancel)
+<<<<<<< HEAD
+        self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
+=======
         self.can.bind(LCAM, self.leftCamKey)
         self.can.bind(RCAM, self.rightCamKey)
         self.can.bind(UCAM, self.upCamKey)
         self.can.bind(DCAM, self.downCamKey)
+>>>>>>> 1978656743c712d5efa4351b2098759b6b75e1ac
 
     def drawGrid(self):
         for div in range(NBCELL):
@@ -59,29 +64,31 @@ class GridCanvas:
 
     def wipe(self, segments):
         self.firstCoords = None
+        self.moveLead(MIDDLE, MIDDLE)
         for seg in self.segs:
             self.can.delete(seg.getGraphicObject())
             seg.rmGraphicObject()
         self.segs = segments
         self.redrawSegs()
 
+    def moveLead(self, x, y):
+        self.can.coords(self.lead, x - 3, y - 3, x + 3, y + 3)
+
     def segRequest(self, x, y, X, Y, dct=None):
         free = self.freePoint(X, Y)
         if (not free) or (not self.allowSelfAvoidOnly):
+            # segment backtrack
             if self.counterSeg(x, y, X, Y):
                 self.eraseLastSeg()
                 if len(self.segs) > 0:
-                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
+                    self.moveLead(X, Y)
                     return
         if free:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
             seg = Segment(x, y, dct)
-            if len(self.segs) > 0:
-                self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=SFILL)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1], LFILL)
-
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
@@ -92,6 +99,7 @@ class GridCanvas:
                 x, y = self.firstCoords
             else:
                 self.firstCoords = (X, Y)
+                self.moveLead(X, Y)
                 return
         else:
             x, y = self.segs[-1].getEndPoint()
