@@ -11,6 +11,7 @@ class GridCanvas:
     can = None
     helpShown = False
     firstCoords = None
+    allowSelfAvoidOnly = True
 
     def __init__(self, root):
         self.segs = []
@@ -25,6 +26,7 @@ class GridCanvas:
         self.can.bind("<Down>", self.downKey)
         self.can.bind("<Left>", self.leftKey)
         self.can.bind("<Right>", self.rightKey)
+        self.can.bind("<Control-z>", self.cancel)
         self.can.bind(LCAM, self.leftCamKey)
         self.can.bind(RCAM, self.rightCamKey)
         self.can.bind(UCAM, self.upCamKey)
@@ -64,10 +66,13 @@ class GridCanvas:
         self.redrawSegs()
 
     def segRequest(self, x, y, X, Y, dct=None):
-        if self.segs == []:
-            free = True
-        else:
-            free = self.freePoint(X, Y)
+        free = self.freePoint(X, Y)
+        if (not free) or (not self.allowSelfAvoidOnly):
+            if self.counterSeg(x, y, X, Y):
+                self.eraseLastSeg()
+                if len(self.segs) > 0:
+                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
+                    return
         if free:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
@@ -76,18 +81,18 @@ class GridCanvas:
                 self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=SFILL)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1], LFILL)
-        else:
-            if self.counterSeg(x, y, X, Y):
-                self.eraseLastSeg()
-                if len(self.segs) > 0:
-                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
+
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
         X = (Xa + Xb)/2
         Y = (Ya + Yb)/2
         if self.segs == []:
-            x, y = self.firstCoords
+            if self.firstCoords is not None:
+                x, y = self.firstCoords
+            else:
+                self.firstCoords = (X, Y)
+                return
         else:
             x, y = self.segs[-1].getEndPoint()
         cont = self.continuous(x, y, X, Y)
@@ -120,11 +125,19 @@ class GridCanvas:
                 return 2
 
     def counterSeg(self, x, y, X, Y):
+        if self.segs == []:
+            return False
         st = self.segs[-1].getStartPoint()
         end = self.segs[-1].getEndPoint()
         return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
+        if X < 0 or Y < 0 or X > GSIZE or Y > GSIZE:
+            return False
+        if not self.allowSelfAvoidOnly:
+            return True
+        if self.segs == []:
+            return True
         if self.segs[0].getStartPoint() == (X, Y):
             return False
         for seg in self.segs:
@@ -222,3 +235,7 @@ class GridCanvas:
 
     def upCamKey(self, event):
         self.moveAllSeg(3)
+
+    def cancel(self, event):
+        if not self.segs == []:
+            self.requestSegByDct((self.segs[-1].dct + 2)%4)
