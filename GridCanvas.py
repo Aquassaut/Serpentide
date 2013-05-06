@@ -19,8 +19,8 @@ class GridCanvas:
     # dct is the segment direction :
     #   up -> 3
     #   down -> 1
-    #   right -> 0,
-    #   left -> 2.
+    #   right -> 0
+    #   left -> 2
 
 
     def __init__(self, root):
@@ -40,10 +40,19 @@ class GridCanvas:
         self.can.bind("<Down>", self.keyMove)
         self.can.bind("<Left>", self.keyMove)
         self.can.bind("<Right>", self.keyMove)
-        self.can.bind("<Control-z>", self.undo)
-        self.can.bind("<Double-Button-1>", self.doubleClick)
-        for key in [LCAM, RCAM, UCAM, DCAM]:
+
+        # Move the draw on the screen. Keybinds :
+        #   "q": left
+        #   "d": right
+        #   "z": up
+        #   "s": down
+        for key in ["q", "d", "z", "s"]:
             self.can.bind(key, self.keyCam)
+
+        # Launch undo
+        self.can.bind("<Control-z>", self.undo)
+        # Launch segments rotations around the double clicked point
+        self.can.bind("<Double-Button-1>", self.doubleClick)
 
         self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
 
@@ -300,12 +309,16 @@ class GridCanvas:
 
     # Set a direction from the keyboard arrow pressed by the user, and move
     # the map in this direction
+    #   z : up
+    #   s : down
+    #   q : left
+    #   d : right
     def keyCam(self, event):
         movPerKey = {
-            RCAM: 0,
-            DCAM: 1,
-            LCAM: 2,
-            UCAM: 3
+            "d": 0,
+            "s": 1,
+            "q": 2,
+            "z": 3
         }
         self.moveAllSeg(movPerKey[event.char])
 
