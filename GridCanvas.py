@@ -218,11 +218,15 @@ class GridCanvas:
         self.wipe(self.segs)
 
     def keyMove(self, event):
+        UP = 111
+        RIGHT = 114
+        LEFT = 116
+        DOWN = 113
         dctPerKey = {
-            111: 3,
-            114: 0,
-            116: 1,
-            113: 2
+            UP: 3,
+            RIGHT: 0,
+            LEFT: 1,
+            DOWN: 2
         }
         self.requestSegByDct(dctPerKey[event.keycode])
 
