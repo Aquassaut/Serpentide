@@ -34,6 +34,8 @@ class GridCanvas:
         self.can.bind(DCAM, self.downCamKey)
         self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
 
+        self.can.focus_force()
+
     def drawGrid(self):
         for div in range(NBCELL):
             sec = SSIZE*div
