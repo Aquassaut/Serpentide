@@ -220,13 +220,13 @@ class GridCanvas:
     def keyMove(self, event):
         UP = 111
         RIGHT = 114
-        LEFT = 116
-        DOWN = 113
+        DOWN = 116
+        LEFT = 113
         dctPerKey = {
             UP: 3,
             RIGHT: 0,
-            LEFT: 1,
-            DOWN: 2
+            DOWN: 1,
+            LEFT: 2
         }
         self.requestSegByDct(dctPerKey[event.keycode])
 
