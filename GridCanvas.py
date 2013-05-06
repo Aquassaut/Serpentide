@@ -62,6 +62,12 @@ class GridCanvas:
 
     def segRequest(self, x, y, X, Y, dct=None):
         free = self.freePoint(X, Y)
+        if (not free) or (not self.allowSelfAvoidOnly):
+            if self.counterSeg(x, y, X, Y):
+                self.eraseLastSeg()
+                if len(self.segs) > 0:
+                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
+                    return
         if free:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
@@ -70,11 +76,7 @@ class GridCanvas:
                 self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=SFILL)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1], LFILL)
-        else:
-            if self.counterSeg(x, y, X, Y):
-                self.eraseLastSeg()
-                if len(self.segs) > 0:
-                    self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=LFILL)
+        
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
@@ -114,14 +116,16 @@ class GridCanvas:
                 return 2
 
     def counterSeg(self, x, y, X, Y):
+        if self.segs == []:
+            return False
         st = self.segs[-1].getStartPoint()
         end = self.segs[-1].getEndPoint()
         return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
-        if segs == []:
-            return True
         if not self.allowSelfAvoidOnly:
+            return True 
+        if self.segs == []:
             return True
         if self.segs[0].getStartPoint() == (X, Y):
             return False
