@@ -242,7 +242,7 @@ class GridCanvas:
         if not self.helpShown:
             self.showHelp()
 
-    # Rotates all following segments from the doble clicked node
+    # Rotates all following segments from the double clicked node
     # (Called when the left button is pressed twice)
     def doubleClick(self, event):
         doRotation = False
