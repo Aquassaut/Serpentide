@@ -85,7 +85,8 @@ class GridCanvas:
                 dct = self.findDct(x, y, X, Y)
             seg = Segment(x, y, dct)
             self.segs.append(seg)
-            self.drawSeg(self.segs[-1], LFILL)
+            self.drawSeg(self.segs[-1], SFILL)
+            self.moveLead(X, Y)
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
@@ -199,7 +200,6 @@ class GridCanvas:
     def moveAllSeg(self, dct, amount=1):
         dy = 0
         dx = 0
-
         if dct == 0:
             dx = 1
         elif dct == 2:
@@ -208,13 +208,10 @@ class GridCanvas:
             dy = 1
         else:
             dy = -1
-
-        dx = dx*amount*SSIZE
-        dy = dy*amount*SSIZE
-
+        dx = dx * amount * SSIZE
+        dy = dy * amount * SSIZE
         for seg in self.segs:
             seg.move(dx, dy)
-
         self.wipe(self.segs)
 
     def leftKey(self, event):
@@ -243,4 +240,4 @@ class GridCanvas:
 
     def cancel(self, event):
         if not self.segs == []:
-            self.requestSegByDct((self.segs[-1].dct + 2)%4)
+            self.requestSegByDct((self.segs[-1].getDct() + 2) % 4)

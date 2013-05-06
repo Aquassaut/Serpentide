@@ -37,7 +37,7 @@ class App:
         return filemenu
 
     def ansf(self):
-        if self.can.allowSelfAvoidOnly :
+        if self.can.allowSelfAvoidOnly:
             self.can.allowSelfAvoidOnly = False
         else:
             self.can.allowSelfAvoidOnly = True
