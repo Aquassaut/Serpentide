@@ -11,6 +11,7 @@ class GridCanvas:
     can = None
     helpShown = False
     firstCoords = None
+    allowSelfAvoidOnly = True
 
     def __init__(self, root):
         self.segs = []
@@ -121,6 +122,8 @@ class GridCanvas:
         return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
+        if not self.allowSelfAvoidOnly:
+            return True
         if self.segs[0].getStartPoint() == (X, Y):
             return False
         for seg in self.segs:

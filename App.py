@@ -18,7 +18,13 @@ class App:
     def drawMenu(self, root):
         menuBar = Menu(root)
         menuBar.add_cascade(label="File", menu=self.drawFileMenu(menuBar))
+        menuBar.add_cascade(label="Options", menu=self.drawOptionsMenu(menuBar))
         root.config(menu=menuBar)
+
+    def drawOptionsMenu(self, menuBar):
+        optionsmenu = Menu(menuBar, tearoff=0)
+        optionsmenu.add_checkbutton(label="Allow non self-avoiding", command=self.ansf)
+        return optionsmenu
 
     def drawFileMenu(self, menuBar):
         filemenu = Menu(menuBar, tearoff=0)
@@ -29,6 +35,12 @@ class App:
         filemenu.add_command(label="Debug", command=self.debug)
         filemenu.add_command(label="Quit", command=root.quit)
         return filemenu
+
+    def ansf(self):
+        if self.can.allowSelfAvoidOnly :
+            self.can.allowSelfAvoidOnly = False
+        else:
+            self.can.allowSelfAvoidOnly = True
 
     def saveAs(self):
         filename = self.getSaveDialog()
