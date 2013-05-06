@@ -26,6 +26,7 @@ class GridCanvas:
         self.can.bind("<Down>", self.downKey)
         self.can.bind("<Left>", self.leftKey)
         self.can.bind("<Right>", self.rightKey)
+        self.can.bind("<Control-z>", self.cancel)
 
     def drawGrid(self):
         for div in range(NBCELL):
@@ -76,7 +77,7 @@ class GridCanvas:
                 self.can.itemconfig(self.segs[-1].getGraphicObject(), fill=SFILL)
             self.segs.append(seg)
             self.drawSeg(self.segs[-1], LFILL)
-        
+
 
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
@@ -130,7 +131,7 @@ class GridCanvas:
         if X < 0 or Y < 0 or X > GSIZE or Y > GSIZE:
             return False
         if not self.allowSelfAvoidOnly:
-            return True 
+            return True
         if self.segs == []:
             return True
         if self.segs[0].getStartPoint() == (X, Y):
@@ -197,3 +198,8 @@ class GridCanvas:
 
     def upKey(self, event):
         self.requestSegByDct(3)
+
+    def cancel(self, event):
+        if not self.segs == []:
+            self.requestSegByDct((self.segs[-1].dct + 2)%4)
+
