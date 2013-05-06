@@ -11,8 +11,17 @@ class GridCanvas:
     can = None
     helpShown = False
     firstCoords = None
+    # allowSelfAvoidOnly is an option activated by default (can be deactivated
+    # by the user in the GUI) which forbid segments collisions.
     allowSelfAvoidOnly = True
     lead = None
+
+    # dct is the segment direction :
+    #   up -> 3
+    #   down -> 1
+    #   right -> 0,
+    #   left -> 2.
+
 
     def __init__(self, root):
         self.segs = []
@@ -20,9 +29,13 @@ class GridCanvas:
         self.can.pack(expand=YES, side=LEFT)
         self.drawHelp()
         self.drawGrid()
+
+        # Print help, add or remove segments with the mouse
         self.can.bind("<Button-1>", self.click)
         self.can.bind("<B1-Motion>", self.swipe)
         self.can.bind("<ButtonRelease-1>", self.swipeEnd)
+
+        # Add or remove segments with the keyboard arrows
         self.can.bind("<Up>", self.keyMove)
         self.can.bind("<Down>", self.keyMove)
         self.can.bind("<Left>", self.keyMove)
@@ -34,12 +47,16 @@ class GridCanvas:
 
         self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
 
+        # Necessary to avoid clicking on the window/grid at start
+        self.can.focus_force()
+
     def drawGrid(self):
         for div in range(NBCELL):
             sec = SSIZE*div
             self.can.create_line(0, sec, GSIZE, sec, width=3, fill=GFILL)
             self.can.create_line(sec, 0, sec, GSIZE, width=3, fill=GFILL)
 
+    # Draw circles on each cross on the grid to help the user
     def drawHelp(self):
         self.helpCircles = []
         for hor in range(1, NBCELL):
@@ -49,16 +66,19 @@ class GridCanvas:
                 temp = self.can.create_oval(x - CR, y - CR, x + CR, y + CR, **HCOPT)
                 self.helpCircles.append(temp)
 
+    # Hide the circles (help)
     def hideHelp(self):
         for circle in self.helpCircles:
             self.can.itemconfig(circle, **HCOPT)
         self.helpShown = False
 
+    # Show the circles (help)
     def showHelp(self):
         for circle in self.helpCircles:
             self.can.itemconfig(circle, **SCOPT)
         self.helpShown = True
 
+    # Clean the segments and redraw the walk given in parameter
     def wipe(self, segments):
         self.firstCoords = None
         self.moveLead(MIDDLE, MIDDLE)
@@ -68,9 +88,12 @@ class GridCanvas:
         self.segs = segments
         self.redrawSegs()
 
+    # Move the lead on the coordinates given in parameter
     def moveLead(self, x, y):
         self.can.coords(self.lead, x - 3, y - 3, x + 3, y + 3)
 
+    # Create a new segment at the coordinates given in parameter if possible.
+    # If there is already the last created segment, segRequest() delete it.
     def segRequest(self, x, y, X, Y, dct=None):
         free = self.freePoint(X, Y)
         if (not free) or (not self.allowSelfAvoidOnly):
@@ -91,6 +114,7 @@ class GridCanvas:
             self.drawSeg(seg, SFILL)
             self.moveLead(X, Y)
 
+    # Calculates the segment coordinates when it is created with the mouse
     def requestSegByCircle(self, circle):
         Xa, Ya, Xb, Yb = self.can.coords(circle)
         X = (Xa + Xb)/2
@@ -108,6 +132,7 @@ class GridCanvas:
         if cont:
             self.segRequest(x, y, X, Y)
 
+    # Calculates the segment direction when it is created with the keyboard
     def requestSegByDct(self, dct):
         if self.segs == []:
             x, y = MIDDLE, MIDDLE
@@ -121,6 +146,7 @@ class GridCanvas:
         }[dct]
         self.segRequest(x, y, X, Y, dct)
 
+    # Return the segment direction
     def findDct(self, x, y, X, Y):
         if x == X:
             if Y < y:
@@ -133,6 +159,7 @@ class GridCanvas:
             else:
                 return 2
 
+    # Return segments number between the start point and the end point
     def counterSeg(self, x, y, X, Y):
         if self.segs == []:
             return False
@@ -140,6 +167,8 @@ class GridCanvas:
         end = self.segs[-1].getEndPoint()
         return st == (X, Y) and end == (x, y)
 
+    # Check if it is possible to draw a segment at the cordinated given in
+    # parameter.
     def freePoint(self, X, Y):
         if X < 0 or Y < 0 or X > GSIZE or Y > GSIZE:
             return False
@@ -154,24 +183,32 @@ class GridCanvas:
                 return False
         return True
 
+    # Check if the space between the first point and the second point is
+    # composed by continuous segments
     def continuous(self, x, y, X, Y):
         hor = fabs(x - X) == SSIZE and y == Y
         ver = fabs(y - Y) == SSIZE and x == X
         return (hor and not ver) or (ver and not hor)
 
+    # Draw segment(s) from the start point to the end point.
     def drawSeg(self, seg, sfill=SFILL):
         x, y = seg.getStartPoint()
         X, Y = seg.getEndPoint()
         go = self.can.create_line(x, y, X, Y, width=3, fill=sfill)
         seg.addGraphicObject(go)
 
+    # Clear the last segment
     def eraseLastSeg(self):
         self.can.delete(self.segs.pop().getGraphicObject())
 
+    # Draw a walk given in parameter
     def redrawSegs(self):
         for seg in self.segs:
             self.drawSeg(seg)
 
+    # Check if the cursor is in a circle (hitbox) :
+    #   yes -> return the circle,
+    #   no -> return false.
     def findInter(self, x, y):
         items = self.can.find_overlapping(x, y, x, y)
         for item in items:
@@ -179,6 +216,8 @@ class GridCanvas:
                 return item
         return False
 
+    # Create segments in following the cursor
+    # (Called when the left mouse button is keeping pressed)
     def swipe(self, event):
         if not self.helpShown:
             self.showHelp()
@@ -186,12 +225,15 @@ class GridCanvas:
         if circle:
             self.requestSegByCircle(circle)
 
+    # Hide circles (help)
+    # (Called when the left mouse button is released)
     def swipeEnd(self, event):
         if self.helpShown:
             self.hideHelp()
 
+    # Show help and initialize the first segment point
+    # (Called when the left mouse button is pressed)
     def click(self, event):
-        self.can.focus_force()
         if self.segs == []:
             startCircle = self.findInter(event.x, event.y)
             if startCircle:
@@ -200,6 +242,8 @@ class GridCanvas:
         if not self.helpShown:
             self.showHelp()
 
+    # Rotates all following segments from the doble clicked node
+    # (Called when the left button is pressed twice)
     def doubleClick(self, event):
         doRotation = False
 
@@ -219,6 +263,7 @@ class GridCanvas:
 
             self.wipe(self.segs)
 
+    # Move all segments in a direction given in parameter
     def moveAllSeg(self, dct, amount=1):
         dy = 0
         dx = 0
@@ -238,15 +283,23 @@ class GridCanvas:
         self.wipe(self.segs)
         self.moveLead(dx, dy)
 
+    # Set a direction from the keyboard arrow pressed by the user, and create
+    # a new segment in this direction
     def keyMove(self, event):
+        UP = 111
+        RIGHT = 114
+        DOWN = 116
+        LEFT = 113
         dctPerKey = {
-            111: 3,
-            114: 0,
-            116: 1,
-            113: 2
+            UP: 3,
+            RIGHT: 0,
+            DOWN: 1,
+            LEFT: 2
         }
         self.requestSegByDct(dctPerKey[event.keycode])
 
+    # Set a direction from the keyboard arrow pressed by the user, and move
+    # the map in this direction
     def keyCam(self, event):
         movPerKey = {
             RCAM: 0,
@@ -256,6 +309,8 @@ class GridCanvas:
         }
         self.moveAllSeg(movPerKey[event.char])
 
+    # Delete the last segment (uses the fact that creating a segment over the
+    # last one erase it).
     def undo(self, event=None):
         if not self.segs == []:
             self.requestSegByDct((self.segs[-1].getDct() + 2) % 4)
