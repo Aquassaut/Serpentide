@@ -25,6 +25,10 @@ class GridCanvas:
         self.can.bind("<Down>", self.downKey)
         self.can.bind("<Left>", self.leftKey)
         self.can.bind("<Right>", self.rightKey)
+        self.can.bind(LCAM, self.leftCamKey)
+        self.can.bind(RCAM, self.rightCamKey)
+        self.can.bind(UCAM, self.upCamKey)
+        self.can.bind(DCAM, self.downCamKey)
 
     def drawGrid(self):
         for div in range(NBCELL):
@@ -129,8 +133,8 @@ class GridCanvas:
         return True
 
     def continuous(self, x, y, X, Y):
-        hor = fabs(x - X) == 25 and y == Y
-        ver = fabs(y - Y) == 25 and x == X
+        hor = fabs(x - X) == SSIZE and y == Y
+        ver = fabs(y - Y) == SSIZE and x == X
         return (hor and not ver) or (ver and not hor)
 
     def drawSeg(self, seg, sfill=SFILL):
@@ -174,6 +178,27 @@ class GridCanvas:
         if not self.helpShown:
             self.showHelp()
 
+    def moveAllSeg(self, dct, amount=1):
+        dy = 0
+        dx = 0
+
+        if dct == 0:
+            dx = 1
+        elif dct == 2:
+            dx = -1
+        elif dct == 1:
+            dy = 1
+        else:
+            dy = -1
+
+        dx = dx*amount*SSIZE
+        dy = dy*amount*SSIZE
+
+        for seg in self.segs:
+            seg.move(dx, dy)
+
+        self.wipe(self.segs)
+
     def leftKey(self, event):
         self.requestSegByDct(2)
 
@@ -185,3 +210,15 @@ class GridCanvas:
 
     def upKey(self, event):
         self.requestSegByDct(3)
+
+    def leftCamKey(self, event):
+        self.moveAllSeg(2)
+
+    def downCamKey(self, event):
+        self.moveAllSeg(1)
+
+    def rightCamKey(self, event):
+        self.moveAllSeg(0)
+
+    def upCamKey(self, event):
+        self.moveAllSeg(3)
