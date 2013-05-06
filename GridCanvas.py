@@ -76,16 +76,19 @@ class GridCanvas:
         if (not free) or (not self.allowSelfAvoidOnly):
             # segment backtrack
             if self.counterSeg(x, y, X, Y):
-                self.eraseLastSeg()
                 if len(self.segs) > 0:
                     self.moveLead(X, Y)
-                    return
+                else:
+                    leadX, leadY = self.segs[-1].getStartPoint()
+                    self.moveLead(leadX, leadY)
+                self.eraseLastSeg()
+                return
         if free:
             if dct is None:
                 dct = self.findDct(x, y, X, Y)
             seg = Segment(x, y, dct)
             self.segs.append(seg)
-            self.drawSeg(self.segs[-1], SFILL)
+            self.drawSeg(seg, SFILL)
             self.moveLead(X, Y)
 
     def requestSegByCircle(self, circle):
