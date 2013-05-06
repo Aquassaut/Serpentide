@@ -127,6 +127,8 @@ class GridCanvas:
         return st == (X, Y) and end == (x, y)
 
     def freePoint(self, X, Y):
+        if X < 0 or Y < 0 or X > GSIZE or Y > GSIZE:
+            return False
         if not self.allowSelfAvoidOnly:
             return True 
         if self.segs == []:
