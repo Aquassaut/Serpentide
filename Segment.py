@@ -40,3 +40,6 @@ class Segment:
 
     def rmGraphicObject(self):
         self.go = None
+
+    def rotate(self, angle, origx=self.x, origy=self.y):
+        

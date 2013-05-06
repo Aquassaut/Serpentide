@@ -25,3 +25,9 @@ SCOPT = {
     'outline': "brown",
     'stipple': "gray25"
 }  # shown circles' options
+
+#camera moving keys
+LCAM = "q"
+RCAM = "d"
+UCAM = "z"
+DCAM = "s"
