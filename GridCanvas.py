@@ -27,7 +27,7 @@ class GridCanvas:
         self.can.bind("<Down>", self.keyMove)
         self.can.bind("<Left>", self.keyMove)
         self.can.bind("<Right>", self.keyMove)
-        self.can.bind("<Control-z>", self.cancel)
+        self.can.bind("<Control-z>", self.undo)
         self.can.bind(LCAM, self.leftCamKey)
         self.can.bind(RCAM, self.rightCamKey)
         self.can.bind(UCAM, self.upCamKey)
@@ -238,6 +238,6 @@ class GridCanvas:
     def upCamKey(self, event):
         self.moveAllSeg(3)
 
-    def cancel(self, event):
+    def undo(self, event=None):
         if not self.segs == []:
             self.requestSegByDct((self.segs[-1].getDct() + 2) % 4)

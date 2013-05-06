@@ -9,15 +9,17 @@ from constants import *
 class App:
 
     currentFile = None
+    can = None
 
     def __init__(self, root):
         root.minsize(ASIZE, ASIZE)
-        self.drawMenu(root)
         self.can = GridCanvas(root)
+        self.drawMenu(root)
 
     def drawMenu(self, root):
         menuBar = Menu(root)
         menuBar.add_cascade(label="File", menu=self.drawFileMenu(menuBar))
+        menuBar.add_cascade(label="Edit", menu=self.drawEditMenu(menuBar))
         menuBar.add_cascade(label="Options", menu=self.drawOptionsMenu(menuBar))
         root.config(menu=menuBar)
 
@@ -25,6 +27,11 @@ class App:
         optionsmenu = Menu(menuBar, tearoff=0)
         optionsmenu.add_checkbutton(label="Allow non self-avoiding", command=self.ansf)
         return optionsmenu
+
+    def drawEditMenu(self, menuBar):
+        editmenu = Menu(menuBar, tearoff=0)
+        editmenu.add_command(label="Undo", command=self.can.undo)
+        return editmenu
 
     def drawFileMenu(self, menuBar):
         filemenu = Menu(menuBar, tearoff=0)
