@@ -28,14 +28,11 @@ class GridCanvas:
         self.can.bind("<Left>", self.leftKey)
         self.can.bind("<Right>", self.rightKey)
         self.can.bind("<Control-z>", self.cancel)
-<<<<<<< HEAD
-        self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
-=======
         self.can.bind(LCAM, self.leftCamKey)
         self.can.bind(RCAM, self.rightCamKey)
         self.can.bind(UCAM, self.upCamKey)
         self.can.bind(DCAM, self.downCamKey)
->>>>>>> 1978656743c712d5efa4351b2098759b6b75e1ac
+        self.lead = self.can.create_oval(MIDDLE - 3, MIDDLE - 3, MIDDLE + 3, MIDDLE + 3, fill=LFILL)
 
     def drawGrid(self):
         for div in range(NBCELL):
