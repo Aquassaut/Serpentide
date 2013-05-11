@@ -43,14 +43,7 @@ class Segment:
         self.go = None
 
     def place(self, point):
-        self.x = point[0]
-        self.y = point[1]
+        self.x, y = point
 
     def rotate(self, angle=pi):
-        self.dct = self.dct + 2*angle/pi
-
-        while self.dct > 3:
-            self.dct = self.dct - 4
-
-        while self.dct < 0:
-            self.dct = self.dct + 4
+        self.dct = int((2*angle/pi + self.dct) % 4)
