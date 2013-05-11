@@ -35,10 +35,8 @@ class GridCanvas:
         self.can.bind("<ButtonRelease-1>", self.swipeEnd)
 
         # Add or remove segments with the keyboard arrows
-        self.can.bind("<Up>", self.keyMove)
-        self.can.bind("<Down>", self.keyMove)
-        self.can.bind("<Left>", self.keyMove)
-        self.can.bind("<Right>", self.keyMove)
+        for key in ["<Up>", "<Down>", "<Left>", "<Right>"]:
+            self.can.bind(key, self.keyMove)
 
         # Move the draw on the screen. Keybinds :
         #   "q": left
@@ -274,21 +272,14 @@ class GridCanvas:
 
     def moveAllSeg(self, dct, amount=1):
         """ Move all segments in a direction given in parameter """
-        dy = 0
-        dx = 0
-        if dct == 0:
-            dx = 1
-        elif dct == 2:
-            dx = -1
-        elif dct == 1:
-            dy = 1
-        else:
-            dy = -1
-        dx = dx * amount * SSIZE
-        dy = dy * amount * SSIZE
+        dx, dy = {
+            0: (amount * SSIZE, 0),
+            1: (-amount * SSIZE, 0),
+            2: (0, amount * SSIZE),
+            3: (0, -amount * SSIZE)
+        }[dct]
         for seg in self.segs:
             seg.move(dx, dy)
-
         self.wipe(self.segs)
         self.moveLead(dx, dy)
 
@@ -299,13 +290,13 @@ class GridCanvas:
         RIGHT = 114
         DOWN = 116
         LEFT = 113
-        dctPerKey = {
-            UP: 3,
+        dct = {
             RIGHT: 0,
             DOWN: 1,
-            LEFT: 2
-        }
-        self.requestSegByDct(dctPerKey[event.keycode])
+            LEFT: 2,
+            UP: 3
+        }[event.keycode]
+        self.requestSegByDct(dct)
 
     def keyCam(self, event):
         """ Set a direction from the keyboard arrow pressed by the user, and move
@@ -313,13 +304,13 @@ class GridCanvas:
                     z : up
             q : left      d : right
                     s : down """
-        movPerKey = {
+        dct = {
             "d": 0,
             "s": 1,
             "q": 2,
             "z": 3
-        }
-        self.moveAllSeg(movPerKey[event.char])
+        }[event.char]
+        self.moveAllSeg(dct)
 
     def undo(self, event=None):
         """ Delete the last segment (uses the fact that creating a segment over the
