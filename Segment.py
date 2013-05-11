@@ -1,6 +1,7 @@
 from constants import *
 from math import sin, cos, pi
 
+
 class Segment:
     """ Defines a segment with a length of 1 according
     to its starting point and its direction """
@@ -41,7 +42,7 @@ class Segment:
     def rmGraphicObject(self):
         self.go = None
 
-    def place(self, point ):
+    def place(self, point):
         self.x = point[0]
         self.y = point[1]
 
